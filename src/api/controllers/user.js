@@ -40,6 +40,9 @@ const register = async (req, res, next) => {
       playedGames: req.body.playedGames,
       wantedGames: req.body.wantedGames
     });
+    if (req.file) {
+      newUser.profilePic = req.file.path;
+    }
     const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
       return res.status(400).json('Ese nombre de usuario ya existe');

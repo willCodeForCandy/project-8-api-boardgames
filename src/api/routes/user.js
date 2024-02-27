@@ -1,4 +1,5 @@
 const { isLogedIn, isAdmin } = require('../../middlewares/auth');
+const { upload } = require('../../middlewares/file.');
 const {
   register,
   login,
@@ -11,7 +12,7 @@ const {
 
 const userRoutes = require('express').Router();
 
-userRoutes.post('/register', register);
+userRoutes.post('/register', upload.single('profilePic'), register);
 userRoutes.post('/login', login);
 userRoutes.get('/', getUsers);
 userRoutes.get('/:username', getUserByName);
