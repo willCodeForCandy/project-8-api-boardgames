@@ -6,7 +6,7 @@ const publisherSchema = new mongoose.Schema(
     contry: { type: String, trim: true, required: true },
     publishedGames: {
       type: [mongoose.Types.ObjectId],
-      ref: boardgames
+      ref: 'Boardgame'
     }
   },
   { timestamps: true, collection: 'publishers' }

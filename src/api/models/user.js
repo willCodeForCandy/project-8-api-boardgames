@@ -13,12 +13,13 @@ const userSchema = new mongoose.Schema(
     },
     playedGames: {
       type: [mongoose.Types.ObjectId],
-      ref: boardgames
+      ref: 'Boardgame'
     },
     wantedGames: {
       type: [mongoose.Types.ObjectId],
-      ref: boardgames
-    }
+      ref: 'Boardgame'
+    },
+    isAdmin: { type: Boolean, default: false }
   },
   {
     timestamps: true,

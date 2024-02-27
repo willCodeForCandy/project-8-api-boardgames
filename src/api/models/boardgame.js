@@ -7,7 +7,7 @@ const boardgameSchema = new mongoose.Schema(
     numberOfPlayers: Number,
     publisher: {
       type: mongoose.Types.ObjectId,
-      ref: publishers
+      ref: 'Publisher'
     }
   },
   { timestamps: true, collection: 'boardgames' }
