@@ -68,6 +68,9 @@ const editPublisher = async (req, res, next) => {
 
     if (req.file) {
       newPublisher.img = req.file.path;
+      if (existingPublisher.img) {
+        deleteFileFromCloudinary(existingPublisher.img);
+      }
     }
     const updatedPublisher = await Publisher.findByIdAndUpdate(
       id,

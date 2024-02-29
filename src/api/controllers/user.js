@@ -105,6 +105,7 @@ const editUser = async (req, res, next) => {
       ];
       if (req.file) {
         newUser.profilePic = req.file.path;
+        deleteFileFromCloudinary(existingUser.profilePic);
       }
       const updatedUser = await User.findByIdAndUpdate(id, newUser, {
         new: true
