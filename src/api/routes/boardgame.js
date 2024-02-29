@@ -1,5 +1,5 @@
 const { isLogedIn, isAdmin } = require('../../middlewares/auth');
-const { upload } = require('../../middlewares/file');
+const { upload } = require('../../middlewares/uploadFile');
 const {
   getBoardgames,
   getBoardgameByNumberOfPlayers,

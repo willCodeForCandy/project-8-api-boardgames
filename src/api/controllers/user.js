@@ -1,3 +1,4 @@
+const deleteFileFromCloudinary = require('../../utils/deleteFile');
 const { generateSign } = require('../../utils/jwt');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
@@ -142,6 +143,7 @@ const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const deletedUser = await User.findByIdAndDelete(id);
+    deleteFileFromCloudinary(deletedUser.profilePic);
     if (deletedUser) {
       return res
         .status(200)
