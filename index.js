@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const { connectDB } = require('./src/config/db');
 const userRoutes = require('./src/api/routes/user');
+const boardgameRouter = require('./src/api/routes/boardgame');
 const cloudinary = require('cloudinary').v2;
 
 const app = express();
@@ -15,6 +16,7 @@ cloudinary.config({
 app.use(express.json());
 
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/boardgames', boardgameRouter);
 app.use('*', (req, res) => {
   return res.status(404).json('Route not found 🦖');
 });

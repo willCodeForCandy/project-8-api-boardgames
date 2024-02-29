@@ -4,7 +4,9 @@ const bcrypt = require('bcrypt');
 
 const getUsers = async (req, res, next) => {
   try {
-    const allUsers = await User.find();
+    const allUsers = await User.find()
+      .populate('playedGames', 'name')
+      .populate('wantedGames', 'name');
     const publicData = allUsers.map((user) => {
       const publicUser = {
         username: user.username,
@@ -24,7 +26,9 @@ const getUsers = async (req, res, next) => {
 const getUserByName = async (req, res, next) => {
   try {
     const { username } = req.params;
-    const requestedUser = await User.find({ username });
+    const requestedUser = await User.findOne({ username })
+      .populate('playedGames', 'name')
+      .populate('wantedGames', 'name');
     return res.status(200).json(requestedUser);
   } catch (error) {
     return res.status(400).json(error);
@@ -42,6 +46,10 @@ const register = async (req, res, next) => {
     });
     if (req.file) {
       newUser.profilePic = req.file.path;
+    }
+    if (!newUser.profilePic) {
+      newUser.profilePic =
+        'https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg';
     }
     const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
@@ -78,11 +86,23 @@ const login = async (req, res, next) => {
 const editUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (req.user.id === id || req.user.role === 'admin') {
+    if (req.user.id === id || req.user.isAdmin) {
       //Quiero que solo el mismo usuario o un administrador puedan editar los datos del usuario
       const newUser = new User(req.body);
+      const existingUser = await User.findById(id);
       newUser._id = id;
       newUser.role = req.user.role; //hago que con esta función no se pueda cambiar el rol
+      newUser.playedGames = [
+        ...existingUser.playedGames,
+        ...newUser.playedGames
+      ];
+      newUser.wantedGames = [
+        ...existingUser.wantedGames,
+        ...newUser.wantedGames
+      ];
+      if (req.file) {
+        newUser.profilePic = req.file.path;
+      }
       const updatedUser = await User.findByIdAndUpdate(id, newUser, {
         new: true
       });
@@ -125,7 +145,7 @@ const deleteUser = async (req, res, next) => {
     if (deletedUser) {
       return res
         .status(200)
-        .json({ mensaje: 'usuario eliminado', usuario: deletedUser });
+        .json({ mensaje: 'usuario eliminado', deletedUser });
     } else {
       return res.status(404).json('Usuario no encontrado');
     }
