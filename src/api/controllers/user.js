@@ -38,6 +38,10 @@ const getUserByName = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   try {
+    const existingUser = await User.findOne({ username: req.body.username });
+    if (existingUser) {
+      return res.status(400).json('Ese nombre de usuario ya existe');
+    }
     const newUser = new User({
       username: req.body.username,
       password: req.body.password,
@@ -45,6 +49,7 @@ const register = async (req, res, next) => {
       playedGames: req.body.playedGames,
       wantedGames: req.body.wantedGames
     });
+
     if (req.file) {
       newUser.profilePic = req.file.path;
     }
@@ -52,10 +57,7 @@ const register = async (req, res, next) => {
       newUser.profilePic =
         'https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg';
     }
-    const existingUser = await User.findOne({ username: req.body.username });
-    if (existingUser) {
-      return res.status(400).json('Ese nombre de usuario ya existe');
-    }
+
     const savedUser = await newUser.save();
     return res.status(201).json(savedUser);
   } catch (error) {

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const publisherSchema = new mongoose.Schema(
   {
     name: { type: String, trim: true, required: true },
-    contry: { type: String, trim: true, required: true },
+    img: { type: String, trim: true },
     publishedGames: {
       type: [mongoose.Types.ObjectId],
       ref: 'Boardgame'

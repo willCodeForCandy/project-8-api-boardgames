@@ -26,7 +26,6 @@ const getBoardgameByNumberOfPlayers = async (req, res, next) => {
 };
 const postBoardgame = async (req, res, next) => {
   try {
-    const newBoardgame = new Boardgame(req.body);
     const existingBoardgame = await Boardgame.findOne({
       name: req.body.name
     });
@@ -35,8 +34,8 @@ const postBoardgame = async (req, res, next) => {
         .status(400)
         .json(`${existingBoardgame.name} ya está en la base de datos.`);
     }
-
-    // Si no encuentra otro juego con el mismo nombre, entonces proceso la imagen
+    // Si no encuentra otro juego con el mismo nombre, entonces creo el dato nuevo y proceso las imágenes
+    const newBoardgame = new Boardgame(req.body);
     if (req.files) {
       req.files.forEach((file) => {
         newBoardgame.img.push(file.path);

@@ -15,10 +15,12 @@ const userSchema = new mongoose.Schema(
         ref: 'Boardgame'
       }
     ],
-    wantedGames: {
-      type: [mongoose.Types.ObjectId],
-      ref: 'Boardgame'
-    },
+    wantedGames: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Boardgame'
+      }
+    ],
     isAdmin: { type: Boolean, default: false }
   },
   {
