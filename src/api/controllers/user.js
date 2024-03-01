@@ -116,7 +116,7 @@ const editUser = async (req, res, next) => {
       });
     } else {
       return res
-        .status(400)
+        .status(401)
         .json('No estás autorizado para realizar esta acción');
     }
   } catch (error) {

@@ -6,7 +6,7 @@ const isLogedIn = async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
       return res
-        .status(400)
+        .status(401)
         .json('No estás autorizado para realizar esta acción');
     }
     const { id } = verifyJwt(token);
@@ -20,13 +20,9 @@ const isLogedIn = async (req, res, next) => {
 };
 const isAdmin = async (req, res, next) => {
   try {
-    if (req.user.isAdmin) {
-      next();
-    } else {
-      return res
-        .status(400)
-        .json('No estás autorizado para realizar esta acción');
-    }
+    req.user.isAdmin
+      ? next()
+      : res.status(401).json('Esta acción requiere permisos de administrador');
   } catch (error) {
     return res.status(400).json(error);
   }
