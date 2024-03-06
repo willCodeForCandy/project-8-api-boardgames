@@ -4,7 +4,7 @@ const { connectDB } = require('./src/config/db');
 const userRoutes = require('./src/api/routes/user');
 const boardgameRouter = require('./src/api/routes/boardgame');
 const publisherRouter = require('./src/api/routes/publisher');
-const { connectCloudinary } = require('./src/middlewares/uploadFile');
+const { connectCloudinary } = require('./src/config/cloudinary');
 
 const app = express();
 const PORT = 3000;

@@ -25,10 +25,6 @@ const getPublisherByName = async (req, res, next) => {
     requestedPublisher
       ? res.status(200).json(requestedPublisher)
       : res.status(404).json('Game not found 💔');
-    // if (!requestedPublisher) {
-    //   return res.status(404).json('Game not found 💔');
-    // }
-    // return res.status(200).json(requestedPublisher);
   } catch (error) {
     return res.status(400).json(error);
   }

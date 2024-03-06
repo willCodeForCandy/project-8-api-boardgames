@@ -1,3 +1,4 @@
+const { checkForDuplicates } = require('../../utils/checkForDuplicates');
 const deleteFileFromCloudinary = require('../../utils/deleteFile');
 const { generateSign } = require('../../utils/jwt');
 const User = require('../models/user');
@@ -6,19 +7,16 @@ const bcrypt = require('bcrypt');
 const getUsers = async (req, res, next) => {
   try {
     const allUsers = await User.find()
+      .select([
+        'username',
+        'profilePic',
+        'playedGames',
+        'wantedGames',
+        'isAdmin'
+      ])
       .populate('playedGames', 'name')
       .populate('wantedGames', 'name');
-    const publicData = allUsers.map((user) => {
-      const publicUser = {
-        username: user.username,
-        profilePic: user.profilePic,
-        playedGames: user.playedGames,
-        wantedGames: user.wantedGames,
-        isAdmin: user.isAdmin
-      };
-      return publicUser;
-    });
-    return res.status(200).json(publicData);
+    return res.status(200).json(allUsers);
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -30,7 +28,9 @@ const getUserByName = async (req, res, next) => {
     const requestedUser = await User.findOne({ username })
       .populate('playedGames', 'name')
       .populate('wantedGames', 'name');
-    return res.status(200).json(requestedUser);
+    requestedUser
+      ? res.status(200).json(requestedUser)
+      : res.status(404).json('User not found 🦖');
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -42,12 +42,14 @@ const register = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json('Ese nombre de usuario ya existe');
     }
+    const { username, password, profilePic, playedGames, wantedGames } =
+      req.body;
     const newUser = new User({
-      username: req.body.username,
-      password: req.body.password,
-      profilePic: req.body.profilePic,
-      playedGames: req.body.playedGames,
-      wantedGames: req.body.wantedGames
+      username,
+      password,
+      profilePic,
+      playedGames,
+      wantedGames
     });
 
     if (req.file) {
@@ -95,14 +97,14 @@ const editUser = async (req, res, next) => {
       const existingUser = await User.findById(id);
       newUser._id = id;
       newUser.role = req.user.role; //hago que con esta función no se pueda cambiar el rol
-      newUser.playedGames = [
-        ...existingUser.playedGames,
-        ...newUser.playedGames
-      ];
-      newUser.wantedGames = [
-        ...existingUser.wantedGames,
-        ...newUser.wantedGames
-      ];
+      newUser.playedGames = checkForDuplicates(
+        existingUser.playedGames,
+        newUser.playedGames
+      );
+      newUser.wantedGames = checkForDuplicates(
+        existingUser.wantedGames,
+        newUser.wantedGames
+      );
       if (req.file) {
         newUser.profilePic = req.file.path;
         deleteFileFromCloudinary(existingUser.profilePic);
@@ -147,13 +149,9 @@ const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     const deletedUser = await User.findByIdAndDelete(id);
     deleteFileFromCloudinary(deletedUser.profilePic);
-    if (deletedUser) {
-      return res
-        .status(200)
-        .json({ mensaje: 'usuario eliminado', deletedUser });
-    } else {
-      return res.status(404).json('Usuario no encontrado');
-    }
+    deletedUser
+      ? res.status(200).json({ mensaje: 'Usuario eliminado', deletedUser })
+      : res.status(404).json('Usuario no encontrado');
   } catch (error) {
     return res.status(400).json(error);
   }

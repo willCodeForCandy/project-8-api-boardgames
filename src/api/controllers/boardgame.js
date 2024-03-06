@@ -16,10 +16,11 @@ const getBoardgameByNumberOfPlayers = async (req, res, next) => {
     const requestedBoardgames = await Boardgame.find({
       numberOfPlayers: { $in: Number(players) }
     }).populate('publisher', 'name');
-    if (!requestedBoardgames) {
-      return res.status(404).json('Game not found');
-    }
-    return res.status(200).json(requestedBoardgames);
+    requestedBoardgames.length
+      ? res.status(200).json(requestedBoardgames)
+      : res
+          .status(204)
+          .json('No hay juegos que coincidan con tu criterio de búsqueda');
   } catch (error) {
     return res.status(400).json(error);
   }
